@@ -1,7 +1,10 @@
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Worker;
@@ -23,7 +26,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.web.WebView;
+
 import javax.imageio.ImageIO;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -236,7 +241,7 @@ public class BrowserView {
     }
 
     // makes a button using either an image or a label
-    private Button makeButton (String property, EventHandler<ActionEvent> handler) {
+    private Button makeButton (String property, String methodName) {
         // represent all supported image suffixes
         final String IMAGEFILE_SUFFIXES = 
             String.format(".*\\.(%s)", String.join("|", ImageIO.getReaderFileSuffixes()));
@@ -249,7 +254,26 @@ public class BrowserView {
         } else {
             result.setText(label);
         }
-        result.setOnAction(handler);
+        Method[] methodList = this.getClass().getMethods();
+
+        for (Method m: methodList){
+        	if(m.getName()== methodName){
+        		try {
+					m.invoke(result,label);
+				} catch (IllegalAccessException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (InvocationTargetException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        	}
+        
+        }
+        
         return result;
     }
 
